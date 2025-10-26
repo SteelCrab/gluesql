@@ -329,6 +329,26 @@ mod tests {
                 expr: Box::new(Expr::Literal(AstLiteral::Number(BigDecimal::from(1)))),
             }
             .to_sql(),
-        )
+        );
+
+        assert_eq!(
+            r#""data" -> 'key'"#,
+            &Expr::BinaryOp {
+                left: Box::new(Expr::Identifier("data".to_owned())),
+                op: BinaryOperator::Arrow,
+                right: Box::new(Expr::Literal(AstLiteral::QuotedString("key".to_owned())))
+            }
+            .to_sql()
+        );
+
+        assert_eq!(
+            r#""data" ->> 'key'"#,
+            &Expr::BinaryOp {
+                left: Box::new(Expr::Identifier("data".to_owned())),
+                op: BinaryOperator::LongArrow,
+                right: Box::new(Expr::Literal(AstLiteral::QuotedString("key".to_owned())))
+            }
+            .to_sql()
+        );
     }
 }

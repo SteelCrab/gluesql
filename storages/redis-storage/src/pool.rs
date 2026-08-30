@@ -20,6 +20,12 @@ pub struct ConnectionPool {
 
 impl ConnectionPool {
     pub fn new(client: &Client, size: usize) -> Result<Self> {
+        if size == 0 {
+            return Err(Error::StorageMsg(
+                "[RedisStorage] connection pool size must be greater than 0".to_owned(),
+            ));
+        }
+
         let idle = (0..size)
             .map(|_| {
                 client.get_connection().map_err(|e| {
@@ -87,5 +93,19 @@ impl Drop for PooledConnection<'_> {
         if let Some(conn) = self.conn.take() {
             self.pool.checkin(conn);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::ConnectionPool;
+
+    #[test]
+    fn new_rejects_zero_size() {
+        let client = redis::Client::open("redis://127.0.0.1:6379").unwrap();
+
+        let result = ConnectionPool::new(&client, 0);
+
+        assert!(result.is_err());
     }
 }

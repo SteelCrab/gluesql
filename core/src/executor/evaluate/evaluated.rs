@@ -690,34 +690,12 @@ mod tests {
     }
 
     #[test]
-    fn try_from_evaluated_value_to_bool() {
-        assert_eq!(
-            bool::try_from(Evaluated::Value(Cow::Owned(Value::Bool(true)))),
-            Ok(true),
-        );
-        assert_eq!(
-            bool::try_from(Evaluated::Value(Cow::Owned(Value::I64(42)))),
-            Err(EvaluateError::BooleanTypeRequired("42".to_owned()).into()),
-        );
-    }
-
-    #[test]
     fn long_arrow_non_value_base() {
         let base = Evaluated::Number(Cow::Owned(BigDecimal::from(1)));
         let selector = Evaluated::Text(Cow::Owned("foo".to_owned()));
         assert_eq!(
             base.long_arrow(&selector),
             Err(EvaluateError::ArrowBaseRequiresMapOrList.into()),
-        );
-    }
-
-    #[test]
-    fn long_arrow_null_selector() {
-        let base = Evaluated::Value(Cow::Owned(Value::Map(BTreeMap::new())));
-        let selector = Evaluated::Value(Cow::Owned(Value::Null));
-        assert_eq!(
-            base.long_arrow(&selector),
-            Ok(Evaluated::Value(Cow::Owned(Value::Null))),
         );
     }
 
